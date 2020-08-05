@@ -13,18 +13,26 @@ const baseConfig = {
 const customConfig = {
   development: {
     connection: {
-      database: 'nc_news'
-      // user,
-      // password
+      database: 'nc_news',
+      username: 'helenjanei',
+      password: 'password'
     }
   },
   test: {
     connection: {
-      database: 'nc_news_test'
-      // user,
-      // password
+      database: 'nc_news_test',
+      username: 'helenjanei',
+      password: 'password'
     }
   }
 };
 
-module.exports = { ...customConfig[ENV], ...baseConfig };
+const log = console.log;
+console.log = (...args) => {
+  if (!/FsMigrations/.test(args[0])) log(...args);
+};
+
+module.exports = {
+  ...customConfig[ENV],
+  ...baseConfig
+};
