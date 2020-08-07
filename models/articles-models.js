@@ -11,7 +11,7 @@ selectArticleById = (articleId) => {
     .groupBy("articles.article_id")
     .where("articles.article_id", articleId)
     .then((articleRows) => {
-      console.log('--> articleRows', articleRows)
+      // console.log('--> articleRows', articleRows)
       if (articleRows.length === 0) {
         return Promise.reject({
           status: 404,
@@ -24,30 +24,134 @@ selectArticleById = (articleId) => {
     });
 }
 
+selectArticles = (sort_by, order, author, topic) => {
+
+  if (sort_by !== "articles.author"
+    "title",
+    "articles.article_id",
+    "topic",
+    "articles.created_at",
+    "articles.votes") {
+    return Promise.reject({
+      status: 400,
+      message: "Bad request",
+    })
+  } else if (order !== undefined && order !== "asc" && order !== "desc") {
+    return Promise.reject({
+      status: 400,
+      message: "Bad request",
+    });
+  } else
+    return knex
+      .select(
+        "articles.author",
+        "title",
+        "articles.article_id",
+        "topic",
+        "articles.created_at",
+        "articles.votes"
+      )
+      .from("articles")
+      .leftJoin("comments", "articles.article_id", "comments.article_id")
+      .count("comments.article_id AS comment_count")
+      .groupBy("articles.article_id")
+      .orderBy(sort_by || "created_at", order || "desc")
+      .modify((query) => {
+        if (author) query.where("articles.author", author);
+        if (topic) query.where("articles.topic", topic);
+      })
+      .then((articles) => {
+        return articles;
+        //Promise.reject({ status: 404, msg: "resource not found" });
+      });
+};
+
 patchArticleById = (articleId, incVotes) => {
-  // if (incVotes === undefined) {
-  //   return Promise.reject({
-  //     status: 400,
-  //     msg: "Missing required fields on request body",s
-  // }
   return knex("articles")
     .increment("votes", incVotes)
     .where("article_id", articleId)
     .returning("*")
     .then((articleRows) => {
+      //console.log('--> article rows patch', articleRows)
       if (articleRows.length === 0) {
         return Promise.reject({
           status: 404,
-          msg: 'article not found',
+          msg: 'article Id not found',
         });
       }
+      // console.log('---> return article rows patch controller', articleRows[0]);
       return articleRows[0];
     });
 };
 
+postComment = (username, body, articleId) => {
+  //console.log('--> articleId in postComments', articleId);
+  return knex
+    .select("*")
+    .from("articles")
+    .where("article_id", articleId)
+    .then((articleRows) => {
+      if (articleRows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: `Article not found`,
+        });
+      } else
+        return knex
+          .insert({
+            author: username,
+            article_id: articleId,
+            body
+          })
+          .into("comments")
+          .returning(["comment_id", "votes", "created_at", "author", "body"])
+          .then((commentRows) => {
+            return commentRows[0];
+          });
+    });
+};
+
+getCommentsById = (
+  articleId,
+  sortBy = "created_at",
+  order = "desc"
+) => {
+  // console.log(sortBy);
+  return knex
+    .select("comment_id", "votes", "created_at", "author", "body")
+    .from("comments")
+    .where("article_id", articleId)
+    .orderBy(sortBy, order)
+    .then((commentRows) => {
+      if (commentRows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: `Article not found`,
+        });
+      } else return commentRows;
+    });
+};
+
+removeCommentById = (comment_id) => {
+  return knex("comments")
+    .where("comment_id", comment_id)
+    .del()
+    .then((delCount) => {
+      if (delCount === 0)
+        return Promise.reject({
+          status: 404,
+          msg: "comment_id not found"
+        });
+    });
+}
+
 module.exports = {
   selectArticleById,
-  patchArticleById
+  selectArticles,
+  patchArticleById,
+  postComment,
+  getCommentsById,
+  removeCommentById
 }
 
 // an article object, which should have the following properties:

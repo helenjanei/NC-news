@@ -13,7 +13,7 @@ exports.getUsername = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log('---> controller err', err)
+      // console.log('---> controller err', err)
       next(err);
     });
 };
