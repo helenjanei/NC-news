@@ -16,7 +16,7 @@ const {
 } = require("../models/topics-models");
 
 
-getArticleById = (req, res, next) => {
+const getArticleById = (req, res, next) => {
   const {
     article_id: articleID
   } = req.params;
@@ -32,7 +32,7 @@ getArticleById = (req, res, next) => {
     });
 };
 
-getArticles = (req, res, next) => {
+const getArticles = (req, res, next) => {
   const {
     sort_by,
     order,
@@ -45,7 +45,7 @@ getArticles = (req, res, next) => {
   if (topic) queries.push(selectTopics(topic));
 
   Promise.all(queries)
-    .then(([allArticles, result2]) => {
+    .then(([allArticles]) => {
       res.status(200).send({
         allArticles
       });
@@ -56,7 +56,7 @@ getArticles = (req, res, next) => {
 };
 
 
-updateArticleById = (req, res, next) => {
+const updateArticleById = (req, res, next) => {
   const {
     article_id: articleId
   } = req.params;
@@ -73,7 +73,7 @@ updateArticleById = (req, res, next) => {
     .catch(next);
 };
 
-addComment = (req, res, next) => {
+const addComment = (req, res, next) => {
   const {
     username,
     body
@@ -90,7 +90,7 @@ addComment = (req, res, next) => {
     .catch(next);
 };
 
-fetchCommentsById = (req, res, next) => {
+const fetchCommentsById = (req, res, next) => {
   const {
     article_id: articleId
   } = req.params;
@@ -110,7 +110,7 @@ fetchCommentsById = (req, res, next) => {
     .catch(next);
 };
 
-deleteCommentById = (req, res, next) => {
+const deleteCommentById = (req, res, next) => {
   const {
     comment_id
   } = req.params;

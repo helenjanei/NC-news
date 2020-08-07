@@ -1,6 +1,6 @@
 const knex = require('../db/data/connection.js');
 
-selectTopics = (topic) => {
+const selectTopics = (topic) => {
   return knex
     .select("*")
     .from("topics")
@@ -11,7 +11,7 @@ selectTopics = (topic) => {
       if (topic.length === 0) {
         return Promise.reject({
           status: 404,
-          msg: "topic not found"
+          message: "topic not found"
         });
       }
 

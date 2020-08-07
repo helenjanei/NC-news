@@ -2,7 +2,7 @@ const {
   selectTopics
 } = require("../models/topics-models");
 
-exports.getAllTopics = (req, res, next) => {
+const getAllTopics = (req, res, next) => {
   selectTopics()
     .then((topics) => {
       res.status(200).send({
@@ -13,3 +13,7 @@ exports.getAllTopics = (req, res, next) => {
       next(err);
     });
 };
+
+module.exports = {
+  getAllTopics
+}

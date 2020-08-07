@@ -1,6 +1,6 @@
 const knex = require('../db/data/connection.js');
 
-selectArticleById = (articleId) => {
+const selectArticleById = (articleId) => {
   return knex
     .select("articles.*")
     .from("articles")
@@ -15,28 +15,29 @@ selectArticleById = (articleId) => {
       if (articleRows.length === 0) {
         return Promise.reject({
           status: 404,
-          msg: `${articleId} not found`,
+          message: `${articleId} not found`,
         });
       }
+
       const commentCount = Number(articleRows[0].comment_count);
       articleRows[0].comment_count = commentCount;
       return articleRows[0];
     });
 }
 
-selectArticles = (sort_by, order, author, topic) => {
-
-  if (sort_by !== "articles.author"
-    "title",
-    "articles.article_id",
-    "topic",
-    "articles.created_at",
-    "articles.votes") {
-    return Promise.reject({
-      status: 400,
-      message: "Bad request",
-    })
-  } else if (order !== undefined && order !== "asc" && order !== "desc") {
+const selectArticles = (sort_by, order, author, topic) => {
+  // if (sort_by !== "articles.author" ||
+  //   "title" ||
+  //   "articles.article_id" ||
+  //   "topic" ||
+  //   "articles.created_at" ||
+  //   "articles.votes") {
+  //   return Promise.reject({
+  //     status: 400,
+  //     message: "Bad request",
+  //   })
+  // } else
+  if (order !== undefined && order !== "asc" && order !== "desc") {
     return Promise.reject({
       status: 400,
       message: "Bad request",
@@ -61,12 +62,14 @@ selectArticles = (sort_by, order, author, topic) => {
         if (topic) query.where("articles.topic", topic);
       })
       .then((articles) => {
+        //console.log('articles in model',
+        //  articles) 
         return articles;
         //Promise.reject({ status: 404, msg: "resource not found" });
       });
 };
 
-patchArticleById = (articleId, incVotes) => {
+const patchArticleById = (articleId, incVotes) => {
   return knex("articles")
     .increment("votes", incVotes)
     .where("article_id", articleId)
@@ -76,7 +79,7 @@ patchArticleById = (articleId, incVotes) => {
       if (articleRows.length === 0) {
         return Promise.reject({
           status: 404,
-          msg: 'article Id not found',
+          message: 'article Id not found',
         });
       }
       // console.log('---> return article rows patch controller', articleRows[0]);
@@ -84,7 +87,7 @@ patchArticleById = (articleId, incVotes) => {
     });
 };
 
-postComment = (username, body, articleId) => {
+const postComment = (username, body, articleId) => {
   //console.log('--> articleId in postComments', articleId);
   return knex
     .select("*")
@@ -94,7 +97,7 @@ postComment = (username, body, articleId) => {
       if (articleRows.length === 0) {
         return Promise.reject({
           status: 404,
-          msg: `Article not found`,
+          message: `Article not found`,
         });
       } else
         return knex
@@ -111,7 +114,7 @@ postComment = (username, body, articleId) => {
     });
 };
 
-getCommentsById = (
+const getCommentsById = (
   articleId,
   sortBy = "created_at",
   order = "desc"
@@ -126,13 +129,13 @@ getCommentsById = (
       if (commentRows.length === 0) {
         return Promise.reject({
           status: 404,
-          msg: `Article not found`,
+          message: `Article not found`,
         });
       } else return commentRows;
     });
 };
 
-removeCommentById = (comment_id) => {
+const removeCommentById = (comment_id) => {
   return knex("comments")
     .where("comment_id", comment_id)
     .del()
@@ -140,7 +143,7 @@ removeCommentById = (comment_id) => {
       if (delCount === 0)
         return Promise.reject({
           status: 404,
-          msg: "comment_id not found"
+          message: "comment_id not found"
         });
     });
 }

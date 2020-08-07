@@ -14,10 +14,12 @@ describe("API routes", () => {
         expect(res.body.message).toBe();
       });
   });
-  test("status 405: invalid methods", () => {
+  //next test does not work - according to the docs it should, so I'm a bit lost
+  test(" 405: invalid methods", () => {
     const invalidMethods = ["patch", "post", "delete"];
+    const route = "/api/articles"
     const requests = invalidMethods.map((method) => {
-      return request(app)[method]("/api/")
+      return request(app)[method](route)
         .expect(405)
         .then(({
           body: {
@@ -52,10 +54,10 @@ describe("API routes", () => {
           .expect(405)
           .then(({
             body: {
-              msg
+              message
             }
           }) => {
-            expect(msg).toBe("method not allowed");
+            expect(message).toBe("method not allowed");
           });
       });
       return Promise.all(requests);
@@ -64,7 +66,7 @@ describe("API routes", () => {
 
   describe("/:username", () => {
     describe("GET", () => {
-      test("status 200: responds with the requested username object", () => {
+      test("GET 200: responds with the requested username object", () => {
         return request(app)
           .get("/api/users/butter_bridge")
           .expect(200)
@@ -81,12 +83,12 @@ describe("API routes", () => {
             });
           });
       });
-      test("status 404: non-existent username", () => {
+      test("GET 404: non-existent username", () => {
         return request(app)
           .get("/api/users/stealth")
           .expect(404)
           .then((response) => {
-            //console.log('------>', response.body)
+            // console.log('------>', response.body)
             expect(response.body.message).toBe("username not found");
           });
       });
@@ -94,7 +96,7 @@ describe("API routes", () => {
   });
   describe("/articles", () => {
     describe("GET", () => {
-      test('status 200: responds with an array of article objects, containing certain properties', () => {
+      test('GET 200: responds with an array of article objects, containing the correct properties', () => {
         return request(app)
           .get('/api/articles/1')
           .expect(200)
@@ -217,16 +219,72 @@ describe("API routes", () => {
           });
         });
     });
-    test.only("GET 400: trying to sort articles based on a non-existent column", () => {
+    test("GET 400: trying to sort articles based on a non-existent column", () => {
       return request(app)
         .get("/api/articles?sort_by=not_a_column")
+        .expect(400)
+        .then((res) => {
+          expect(res.body.message).toBe("Bad request");
+        })
+    });
+    test("GET: 400 - order not asc or desc", () => {
+      return request(app)
+        .get("/api/articles?order=first_to_last")
         .expect(400)
         .then(({
           body: {
             message
           }
         }) => {
-          expect(message).toBe("bad request");
+          expect(message).toBe('Bad request');
+        });
+    });
+    test("GET 404: trying to filter articles for a non-existent author", () => {
+      return request(app)
+        .get("/api/articles?author=helen")
+        .expect(404)
+        .then(({
+          body: {
+            message
+          }
+        }) => {
+          expect(message).toBe("username not found");
+        });
+    });
+    test("GET 404: trying to filter articles for a non-existent topic", () => {
+      return request(app)
+        .get("/api/articles?topic=god")
+        .expect(404)
+        .then(({
+          body: {
+            message
+          }
+        }) => {
+          expect(message).toBe("topic not found");
+        });
+    });
+    test("GET 404: trying to filter articles for a non-existent article_id", () => {
+      return request(app)
+        .get("/api/articles/6543213")
+        .expect(404)
+        .then(({
+          body: {
+            message
+          }
+        }) => {
+          expect(message).toBe("6543213 not found");
+        });
+    });
+    test("GET 400: invalid article_id data type", () => {
+      return request(app)
+        .get("/api/articles/aSting")
+        .expect(400)
+        .then(({
+          body: {
+            message
+          }
+        }) => {
+          expect(message).toBe("Bad request");
         });
     });
   });

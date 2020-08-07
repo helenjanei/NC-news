@@ -2,7 +2,7 @@ const {
   selectUsername
 } = require("../models/users-models");
 
-exports.getUsername = (req, res, next) => {
+const getUsername = (req, res, next) => {
   const {
     username
   } = req.params;
@@ -17,3 +17,7 @@ exports.getUsername = (req, res, next) => {
       next(err);
     });
 };
+
+module.exports = {
+  getUsername
+}
