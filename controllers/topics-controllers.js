@@ -9,9 +9,7 @@ const getAllTopics = (req, res, next) => {
         topics,
       });
     })
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next);
 };
 
 module.exports = {

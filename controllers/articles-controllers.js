@@ -26,10 +26,7 @@ const getArticleById = (req, res, next) => {
         article
       });
     })
-    .catch((err) => {
-      //   console.log('error in catch in get article', err)
-      next(err);
-    });
+    .catch(next);
 };
 
 const getArticles = (req, res, next) => {
@@ -50,9 +47,7 @@ const getArticles = (req, res, next) => {
         allArticles
       });
     })
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next);
 };
 
 
@@ -100,9 +95,6 @@ const fetchCommentsById = (req, res, next) => {
   } = req.query;
   getCommentsById(articleId, sortBy, order)
     .then((comments) => {
-      // console.log({
-      //   comments
-      // });
       res.send({
         comments
       });
@@ -119,9 +111,7 @@ const deleteCommentById = (req, res, next) => {
     .then((delCount) => {
       res.sendStatus(204);
     })
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next);
 };
 
 module.exports = {

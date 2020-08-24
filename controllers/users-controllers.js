@@ -12,10 +12,8 @@ const getUsername = (req, res, next) => {
         userObject
       });
     })
-    .catch((err) => {
-      // console.log('---> controller err', err)
-      next(err);
-    });
+    .catch(next);
+
 };
 
 module.exports = {
